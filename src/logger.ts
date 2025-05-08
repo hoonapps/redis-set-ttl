@@ -1,5 +1,4 @@
 import * as winston from 'winston';
-import { utilities as nestWinstonModuleUtilities } from 'nest-winston';
 import { ElasticsearchTransport } from 'winston-elasticsearch';
 
 const esTransport = new ElasticsearchTransport({
@@ -11,10 +10,7 @@ const esTransport = new ElasticsearchTransport({
 
 export const winstonLogger = winston.createLogger({
   level: 'info',
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    nestWinstonModuleUtilities.format.nestLike('App', { prettyPrint: true }),
-  ),
+  format: winston.format.json(),
   transports: [
     new winston.transports.Console(),
     new winston.transports.File({ filename: 'logs/cache.log' }),
