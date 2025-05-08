@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const USER_COUNT = 10;
-const MIN_DELAY = 20000; // 20초
+const MIN_DELAY = 30000; // 30초
 const MAX_DELAY = 120000; // 2분
 const DURATION = 10 * 60 * 1000; // 10분
 const BASE_URL = 'http://localhost:3000';
@@ -19,8 +19,7 @@ async function run() {
   const start = Date.now();
 
   while (Date.now() - start < DURATION) {
-    const delay =
-      Math.floor(Math.random() * (MAX_DELAY - MIN_DELAY + 1)) + MIN_DELAY;
+    const delay = Math.floor(Math.random() * (MAX_DELAY - MIN_DELAY + 1)) + MIN_DELAY;
     const userId = Math.floor(Math.random() * USER_COUNT) + 1;
     await callUser(userId);
     await new Promise((res) => setTimeout(res, delay));
