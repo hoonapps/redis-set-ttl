@@ -20,12 +20,12 @@ export class UserService {
     const key = `user:${id}`;
     const cached = await this.cache.get(key);
     if (cached) {
-      this.logger.log(`[CACHE HIT] ${key}`);
+      this.logger.log(`[CACHE HIT] ${key}`, { key, type: 'HIT', userId: id });
       return cached;
     }
-    this.logger.log(`[CACHE MISS] ${key}`);
+    this.logger.log(`[CACHE MISS] ${key}`, { key, type: 'MISS', userId: id });
     const user = await this.userRepo.findOneBy({ id });
-    if (user) await this.cache.set(key, user, 600); // TTL 10분
+    if (user) await this.cache.set(key, user, 60);
     return user;
   }
 
@@ -33,8 +33,12 @@ export class UserService {
     const user = this.userRepo.create({ name, email });
     const saved = await this.userRepo.save(user);
     const key = `user:${saved.id}`;
-    await this.cache.set(key, saved, 600); // 생성 후 바로 캐싱
-    this.logger.log(`[CACHE SET] ${key}`);
+    await this.cache.set(key, saved, 60);
+    this.logger.log(`[CACHE SET] ${key}`, {
+      key,
+      type: 'MISS',
+      userId: user.id,
+    });
     return saved;
   }
 }
