@@ -27,7 +27,7 @@ import { UserTtlLog } from './user/entities/user-ttl-log.entity';
         store: redisStore,
         host: process.env.REDIS_HOST || 'localhost',
         port: +process.env.REDIS_PORT || 6379,
-        ttl: 60,
+        ttl: 0,
       }),
     }),
   ],

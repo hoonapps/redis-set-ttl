@@ -31,7 +31,7 @@ export class UserService {
     const user = await this.userRepo.findOneBy({ id });
 
     if (user) {
-      await this.cache.set(key, JSON.stringify(user), 60);
+      await this.cache.set(key, JSON.stringify(user), 60 * 1000);
       this.logger.log(`[CACHE SET] ${key}`, { key, type: 'SET', userId: id });
     }
 
@@ -43,7 +43,7 @@ export class UserService {
     const saved = await this.userRepo.save(user);
     const key = `user:${saved.id}`;
 
-    await this.cache.set(key, saved, 60);
+    await this.cache.set(key, saved, 60 * 1000);
 
     this.logger.log(`[CACHE SET] ${key}`, {
       key,
