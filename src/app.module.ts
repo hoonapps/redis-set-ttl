@@ -9,23 +9,25 @@ import { UserTtlLog } from './user/entities/user-ttl-log.entity';
 @Module({
   imports: [
     UserModule, //
-    UserTtlLog, //
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DB_HOST,
-      port: +process.env.DB_PORT,
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      entities: [User, UserTtlLog],
-      synchronize: true,
+    TypeOrmModule.forRootAsync({
+      useFactory: () => ({
+        type: 'postgres',
+        host: process.env.DB_HOST,
+        port: +process.env.DB_PORT,
+        username: process.env.DB_USERNAME,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+        entities: [User, UserTtlLog],
+        synchronize: true,
+      }),
     }),
     CacheModule.registerAsync({
       useFactory: () => ({
+        isGlobal: true,
         store: redisStore,
         host: process.env.REDIS_HOST || 'localhost',
         port: +process.env.REDIS_PORT || 6379,
-        ttl: 0,
+        ttl: 60,
       }),
     }),
   ],

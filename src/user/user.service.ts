@@ -18,23 +18,21 @@ export class UserService {
 
   async findById(id: number) {
     const key = `user:${id}`;
-    const cached = await this.cache.get(key);
+    const cachedRaw = await this.cache.get<string>(key);
 
-    if (cached) {
+    if (cachedRaw) {
+      const cached = JSON.parse(cachedRaw);
       this.logger.log(`[CACHE HIT] ${key}`, { key, type: 'HIT', userId: id });
       return cached;
     }
 
     this.logger.log(`[CACHE MISS] ${key}`, { key, type: 'MISS', userId: id });
 
-    const user = await this.userRepo.findOne({
-      where: { id },
-    });
+    const user = await this.userRepo.findOneBy({ id });
 
-    console.log('🚀 ~ UserService ~ findById ~ user:', user);
     if (user) {
-      await this.cache.set(key, user, 60);
-      console.log('🚀 ~ UserService ~ findById ~ user:', user);
+      await this.cache.set(key, JSON.stringify(user), 60);
+      this.logger.log(`[CACHE SET] ${key}`, { key, type: 'SET', userId: id });
     }
 
     return user;
