@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const USER_COUNT = 10;
 const MIN_DELAY = 30 * 1000;
-const MAX_DELAY = 10 * 60 * 1000;
+const MAX_DELAY = 90 * 1000;
 const END_TIME = Date.now() + 10 * 60 * 1000; // 10분간 실행
 
 async function callLoop(userId: number) {

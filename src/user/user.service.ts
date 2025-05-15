@@ -1,14 +1,14 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+// src/user/user.service.ts
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cache } from 'cache-manager';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { winstonLogger } from 'src/logger';
 
 @Injectable()
 export class UserService {
-  private readonly logger = new Logger(UserService.name);
-
   constructor(
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
@@ -22,17 +22,17 @@ export class UserService {
 
     if (cachedRaw) {
       const cached = JSON.parse(cachedRaw);
-      this.logger.log(`[CACHE HIT] ${key}`, { key, type: 'HIT', userId: id });
+      winstonLogger.info(`[CACHE HIT] ${key}`, { key, type: 'HIT', userId: id });
       return cached;
     }
 
-    this.logger.log(`[CACHE MISS] ${key}`, { key, type: 'MISS', userId: id });
+    winstonLogger.info(`[CACHE MISS] ${key}`, { key, type: 'MISS', userId: id });
 
     const user = await this.userRepo.findOneBy({ id });
 
     if (user) {
       await this.cache.set(key, JSON.stringify(user), 60 * 1000);
-      this.logger.log(`[CACHE SET] ${key}`, { key, type: 'SET', userId: id });
+      winstonLogger.info(`[CACHE SET] ${key}`, { key, type: 'SET', userId: id });
     }
 
     return user;
@@ -43,12 +43,12 @@ export class UserService {
     const saved = await this.userRepo.save(user);
     const key = `user:${saved.id}`;
 
-    await this.cache.set(key, saved, 60 * 1000);
+    await this.cache.set(key, JSON.stringify(saved), 60 * 1000);
 
-    this.logger.log(`[CACHE SET] ${key}`, {
+    winstonLogger.info(`[CACHE SET] ${key}`, {
       key,
       type: 'MISS',
-      userId: user.id,
+      userId: saved.id,
     });
 
     return saved;
